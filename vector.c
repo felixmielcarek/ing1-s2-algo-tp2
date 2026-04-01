@@ -112,16 +112,16 @@ VectorStatus vector_erase(p_s_vector p_vector, ssize_t i) {
         return VECTOR_ERROR_OUT_OF_BOUNDS;
     }
 
+    for (ssize_t j = i; j < p_vector->size - 1; j++) {
+        p_vector->data[j] = p_vector->data[j + 1];
+    }
+    p_vector->size--;
+
     double* new_data = realloc(p_vector->data, (p_vector->size - 1) * sizeof(double));
     if (new_data == NULL) {
         return VECTOR_ERROR_ALLOCATION;
     }
     p_vector->data = new_data;
-
-    for (ssize_t j = i; j < p_vector->size - 1; j++) {
-        p_vector->data[j] = p_vector->data[j + 1];
-    }
-    p_vector->size--;
 
     return VECTOR_SUCCESS;
 }

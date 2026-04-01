@@ -1,0 +1,46 @@
+name: CI - Build, Test & Memory Check
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential valgrind
+
+      - name: Build project
+        run: make
+
+      - name: Run tests
+        run: ./test_unit
+
+      - name: Check memory leaks with Valgrind
+        run: |
+          make valgrind > valgrind_output.txt 2>&1
+          if grep -q "ERROR SUMMARY: 0 errors" valgrind_output.txt && \
+             grep -q "All heap blocks were freed -- no leaks are possible\|no leaks are possible\|definitely lost: 0 bytes in 0 blocks" valgrind_output.txt; then
+            echo "✓ No memory leaks detected"
+            exit 0
+          else
+            echo "✗ Memory leaks or errors detected:"
+            cat valgrind_output.txt
+            exit 1
+          fi
+
+      - name: Upload Valgrind report
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: valgrind-report
+          path: valgrind_output.txt

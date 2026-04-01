@@ -59,6 +59,7 @@ int test_vector_set_get() {
     status = vector_get(vec, 0, &value);
     ASSERT(status == VECTOR_ERROR_NULL_POINTER);
 
+    vector_free(&vec);
     return 0;
 }
 
@@ -83,7 +84,10 @@ int test_vector_insert_erase() {
 
     ASSERT(vector_erase(vec, 0) == VECTOR_SUCCESS);
     ASSERT(vector_get(vec, 0, &value) == VECTOR_SUCCESS && value == v2);
+    
+    vector_free(&vec);
     return 0;
+
 }
 
 // Test de la fonction vector_empty()
@@ -93,6 +97,8 @@ int test_vector_empty() {
     p_s_vector vec = vector_alloc(5);
     ASSERT(vector_empty(vec) == VECTOR_ERROR_NOT_EMPTY);
     ASSERT(vector_clear(vec) == VECTOR_SUCCESS && vector_empty(vec) == VECTOR_SUCCESS);
+
+    vector_free(&vec);
     return 0;
 }
 
